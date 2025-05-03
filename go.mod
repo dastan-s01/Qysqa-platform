@@ -1,0 +1,1 @@
+module qysqa-platform
