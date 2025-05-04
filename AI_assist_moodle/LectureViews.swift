@@ -173,11 +173,44 @@ struct LectureDetailView: View {
         }
     }
 }
-
+struct LoadingOverlay: View {
+    var isLoading: Bool
+    var title: String
+    
+    var body: some View {
+        ZStack {
+            if isLoading {
+                // Background blur
+                Rectangle()
+                    .fill(Color.black.opacity(0.4))
+                    .background(.ultraThinMaterial) // Gaussian blur effect
+                    .edgesIgnoringSafeArea(.all)
+                
+                // Loading container
+                VStack(spacing: 20) {
+                    ProgressView()
+                        .scaleEffect(1.5)
+                        .tint(.white)
+                    
+                    Text(title)
+                        .font(.headline)
+                        .foregroundColor(.white)
+                }
+                .padding(30)
+                .background(
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(Color.black.opacity(0.6))
+                )
+            }
+        }
+        .animation(.easeInOut, value: isLoading)
+    }
+}
 struct PreparationSelectionView: View {
     let course: Course
     @State private var selectedLectures = Set<UUID>()
     @State private var navigateToPreparation = false
+    @State private var isLoading = false
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
@@ -278,7 +311,14 @@ struct PreparationSelectionView: View {
                     
                     Button(action: {
                         if !selectedLectures.isEmpty {
-                            navigateToPreparation = true
+                            // Show loading overlay for 5-6 seconds
+                            isLoading = true
+                            
+                            // Simulate processing time with a delay
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 5.5) {
+                                isLoading = false
+                                navigateToPreparation = true
+                            }
                         }
                     }) {
                         HStack {
@@ -314,6 +354,15 @@ struct PreparationSelectionView: View {
             }
             .background(Color(.systemGray6))
             .navigationBarHidden(true)
+            // Add the loading overlay on top of everything
+            .overlay(
+                LoadingOverlay(
+                    isLoading: isLoading,
+                    title: "Generating Study Materials..."
+                )
+            )
+            // Disable interaction while loading
+            .allowsHitTesting(!isLoading)
         }
     }
     
