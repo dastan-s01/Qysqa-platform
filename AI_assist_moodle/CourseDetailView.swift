@@ -72,11 +72,9 @@ struct CourseDetailView: View {
             
             // Main Content
             TabView(selection: $selectedTab) {
-                // Course Tab (Lectures)
                 LecturesListView(course: course, showUploadLectureSheet: $showUploadLectureSheet)
                     .tag(0)
                 
-                // Materials Tab
                 Text("Course materials will be displayed here")
                     .font(.headline)
                     .foregroundColor(.secondary)
@@ -95,7 +93,6 @@ struct CourseDetailView: View {
                 .foregroundColor(.blue)
             }
             
-            // Add lecture button in toolbar
             ToolbarItem(placement: .navigationBarTrailing) {
                 if selectedTab == 0 {
                     Button(action: {
@@ -118,13 +115,12 @@ struct LecturesListView: View {
     let course: Course
     @Binding var showUploadLectureSheet: Bool
     @State private var showPreparationSheet = false
+    @State private var isLoading = false
     
     var body: some View {
         VStack(spacing: 0) {
-            // Lectures List
             ScrollView {
                 VStack(spacing: 16) {
-                    // Lectures section
                     VStack(spacing: 1) {
                         ForEach(course.lectures) { lecture in
                             NavigationLink(destination: LectureDetailView(lecture: lecture)) {
@@ -141,7 +137,6 @@ struct LecturesListView: View {
                     .cornerRadius(12)
                     .shadow(color: Color.black.opacity(0.04), radius: 4, x: 0, y: 1)
                     
-                    // Add Lecture Button
                     Button(action: {
                         showUploadLectureSheet = true
                     }) {
@@ -162,7 +157,6 @@ struct LecturesListView: View {
                         .shadow(color: Color.black.opacity(0.04), radius: 4, x: 0, y: 1)
                     }
                     
-                    // Additional Resources Section
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Additional Resources")
                             .font(.headline)
@@ -204,7 +198,14 @@ struct LecturesListView: View {
                     
                     // Full Preparation Button
                     Button(action: {
-                        showPreparationSheet = true
+                        // Show loading overlay for a moment before showing the preparation sheet
+                        isLoading = true
+                        
+                        // Delay to simulate processing
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                            isLoading = false
+                            showPreparationSheet = true
+                        }
                     }) {
                         HStack {
                             Image(systemName: "book.fill")
@@ -227,7 +228,6 @@ struct LecturesListView: View {
             }
             .background(Color(UIColor.systemGray6))
             
-            // Bottom Buttons
             HStack(spacing: 0) {
                 Button(action: {}) {
                     Text("Preparation")
@@ -258,6 +258,15 @@ struct LecturesListView: View {
         .sheet(isPresented: $showPreparationSheet) {
             PreparationSelectionView(course: course)
         }
+        // Add the loading overlay on top of everything
+        .overlay(
+            LoadingOverlay(
+                isLoading: isLoading,
+                title: "Preparing..."
+            )
+        )
+        // Disable interaction while loading
+        .allowsHitTesting(!isLoading)
     }
 }
 
