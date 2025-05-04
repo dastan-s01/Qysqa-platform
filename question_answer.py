@@ -11,7 +11,7 @@ nltk.download('punkt')
 # Создание токенизатора для предложений
 sentence_tokenizer = PunktSentenceTokenizer()
 
-# Загрузка модели и токенизатора из transformers
+
 tokenizer = T5Tokenizer.from_pretrained("potsawee/t5-large-generation-squad-QuestionAnswer")
 model = T5ForConditionalGeneration.from_pretrained("potsawee/t5-large-generation-squad-QuestionAnswer")
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
