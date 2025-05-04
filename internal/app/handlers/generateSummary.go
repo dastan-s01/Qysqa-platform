@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"io"
+	"log"
 	"mime/multipart"
 	"net/http"
 	"strconv"
@@ -25,14 +26,20 @@ type MLResponse struct {
 func parseLectureUpload(r *http.Request) (*LectureUploadRequest, error) {
 	err := r.ParseMultipartForm(20 << 20)
 	if err != nil {
+		log.Println("ParseMultipartForm error:", err)
+
 		return nil, err
 	}
 	file, fileHeader, err := r.FormFile("file")
 	if err != nil {
+		log.Println("FormFile error:", err)
+
 		return nil, err
 	}
 	subjectID, err := strconv.ParseInt(r.FormValue("subject_id"), 10, 64)
 	if err != nil {
+		log.Println("ParseInt error:", err)
+
 		return nil, err
 	}
 	return &LectureUploadRequest{

@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  # Сервис PostgreSQL
+  postgres:
+    image: postgres:15
+    container_name: qysqa_postgres
+    restart: always
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: qysqa123
+      POSTGRES_DB: qysqa
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - qysqa-network
+
+  # Сервис бэкенда
+  backend:
+    build:
+      context: .
+      dockerfile: ./cmd/Dockerfile
+    container_name: qysqa-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - ENV=production
+    depends_on:
+      - postgres
+    networks:
+      - qysqa-network
+
+  # Сервис ML
+  ml:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: qysqa-ml
+    environment:
+      - ENV=production
+    depends_on:
+      - postgres
+    networks:
+      - qysqa-network
+
+  # (Опционально) Сервис фронтенда, если нужно
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   container_name: qysqa-frontend
+  #   ports:
+  #     - "3000:3000"
+  #   networks:
+  #     - qysqa-network
+
+networks:
+  qysqa-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
