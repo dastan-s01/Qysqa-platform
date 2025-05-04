@@ -12,7 +12,7 @@ struct LectureDetailView: View {
                         .font(.title2)
                         .fontWeight(.bold)
                     
-                    Text("Date: May \(5 + lecture.number), 2025")
+                    Text("Date: May \(5 + lecture.number), 2026")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
@@ -385,10 +385,7 @@ struct PreparationContentView: View {
                             .foregroundColor(.secondary)
                             .padding(.horizontal)
                         
-                        Text("HERE WILL BE TEST AND ETC.")
-                            .font(.title3)
-                            .fontWeight(.medium)
-                            .padding(.horizontal)
+                      
                         
                         ForEach(lectures) { lecture in
                             preparationLectureSummary(lecture)
@@ -422,11 +419,11 @@ struct PreparationContentView: View {
                                     .font(.headline)
                                     .fontWeight(.bold)
                                 
-                                Text("This is a sample question related to the selected lectures content?")
+                                Text("What does an INNER JOIN return?")
                                     .font(.body)
                                     .padding(.bottom, 8)
                                 
-                                ForEach(["A. First option", "B. Second option", "C. Third option", "D. Fourth option"], id: \.self) { option in
+                                ForEach(["A. All records from both tables", "B. Only the unmatched records from both tables", "C. Only the matched records from both tables", "D. All records from the left table only"], id: \.self) { option in
                                     Button(action: {}) {
                                         HStack(alignment: .top) {
                                             Text(option)
@@ -549,10 +546,19 @@ struct PreparationContentView: View {
                 .fontWeight(.semibold)
                 .padding(.horizontal)
             
+            let joinTypes = [
+                "INNER JOIN",
+                "LEFT JOIN",
+                "RIGHT JOIN",
+                "FULL OUTER JOIN",
+                "CROSS JOIN"
+            ]
+
+            
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack {
-                    ForEach(1...5, id: \.self) { index in
-                        Text("Key Term \(index)")
+                    ForEach(joinTypes, id: \.self) { join in
+                        Text(join)
                             .font(.caption)
                             .padding(.horizontal, 12)
                             .padding(.vertical, 8)
@@ -562,6 +568,8 @@ struct PreparationContentView: View {
                     }
                 }
                 .padding(.horizontal)
+            
+
             }
             
             Divider()

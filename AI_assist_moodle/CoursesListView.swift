@@ -22,127 +22,125 @@ struct CoursesListView: View {
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Search and Filter Bar
-            VStack(spacing: 16) {
-                HStack {
-                    Text("My Courses")
-                        .font(.title)
-                        .fontWeight(.bold)
-                    
-                    Spacer()
-                    
-                    HStack(spacing: 16) {
-                        Button(action: {
-                            showAddCourseSheet = true
-                        }) {
-                            Image(systemName: "plus.circle.fill")
-                                .font(.title)
-                                .foregroundColor(.accentColor)
-                        }
+        ZStack(alignment: .bottom) {
+            // Main content
+            VStack(spacing: 0) {
+                // Search and Filter Bar
+                VStack(spacing: 16) {
+                    HStack {
+                        Text("My Courses")
+                            .font(.title)
+                            .fontWeight(.bold)
                         
-                        Button(action: {}) {
-                            Image(systemName: "person.circle.fill")
-                                .font(.title)
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                }
-                
-                HStack {
-                    Image(systemName: "magnifyingglass")
-                        .foregroundColor(.gray)
-                    
-                    TextField("Search for courses", text: $searchText)
-                        .font(.subheadline)
-                }
-                .padding(10)
-                .background(Color(.systemGray6))
-                .cornerRadius(10)
-                
-                HStack {
-                    Button(action: {
-                        showFilterOptions.toggle()
-                    }) {
-                        HStack {
-                            Text(filterSelection)
-                                .font(.subheadline)
-                                .fontWeight(.medium)
+                        Spacer()
+                        
+                        HStack(spacing: 16) {
+                            Button(action: {
+                                showAddCourseSheet = true
+                            }) {
+                                Image(systemName: "plus.circle.fill")
+                                    .font(.title)
+                                    .foregroundColor(Color(hex: "#0583F2"))
+                            }
                             
-                            Image(systemName: "chevron.down")
-                                .font(.caption)
-                        }
-                        .padding(.vertical, 8)
-                        .padding(.horizontal, 12)
-                        .background(Color(.systemGray6))
-                        .cornerRadius(8)
-                    }
-                    .confirmationDialog("Select Filter", isPresented: $showFilterOptions, titleVisibility: .visible) {
-                        ForEach(filterOptions, id: \.self) { option in
-                            Button(option) {
-                                filterSelection = option
+                            Button(action: {}) {
+                                Image(systemName: "person.circle.fill")
+                                    .font(.title)
+                                    .foregroundColor(.secondary)
                             }
                         }
                     }
                     
-                    Spacer()
+                    HStack {
+                        Image(systemName: "magnifyingglass")
+                            .foregroundColor(.gray)
+                        
+                        TextField("Search for courses", text: $searchText)
+                            .font(.subheadline)
+                    }
+                    .padding(10)
+                    .background(Color(.systemGray6))
+                    .cornerRadius(10)
                     
-                    HStack(spacing: 12) {
-                        Button(action: {}) {
-                            Image(systemName: "list.bullet")
-                                .font(.subheadline)
-                                .foregroundColor(.primary)
+                    HStack {
+                        Button(action: {
+                            showFilterOptions.toggle()
+                        }) {
+                            HStack {
+                                Text(filterSelection)
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                
+                                Image(systemName: "chevron.down")
+                                    .font(.caption)
+                            }
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 12)
+                            .background(Color(.systemGray6))
+                            .cornerRadius(8)
+                        }
+                        .confirmationDialog("Select Filter", isPresented: $showFilterOptions, titleVisibility: .visible) {
+                            ForEach(filterOptions, id: \.self) { option in
+                                Button(option) {
+                                    filterSelection = option
+                                }
+                            }
                         }
                         
-                        Button(action: {}) {
-                            Image(systemName: "square.grid.2x2")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
+                        Spacer()
+                        
+                        HStack(spacing: 12) {
+                            Button(action: {}) {
+                                Image(systemName: "list.bullet")
+                                    .font(.subheadline)
+                                    .foregroundColor(Color(hex: "#000000"))
+                            }
+                            
+                            Button(action: {}) {
+                                Image(systemName: "square.grid.2x2")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                            }
                         }
-                    }
-                }
-            }
-            .padding()
-            .background(Color.white)
-            
-            // Courses List
-            ScrollView {
-                LazyVStack(spacing: 16) {
-                    ForEach(filteredCourses) { course in
-                        NavigationLink(destination: CourseDetailView(course: course)) {
-                            CourseCard(course: course)
-                        }
-                        .buttonStyle(PlainButtonStyle())
                     }
                 }
                 .padding()
-            }
-            
-            // Bottom Tab Bar
-            HStack {
-                TabBarButton(title: "Courses", icon: "book.fill", isActive: true)
-                TabBarButton(title: "Themes", icon: "list.bullet.clipboard")
-                TabBarButton(title: "Chat", icon: "message")
+                .background(Color.white)
                 
-                TabBarButton(title: "Notifications", icon: "bell") {
-                    ZStack {
-                        Circle()
-                            .fill(Color.red)
-                            .frame(width: 18, height: 18)
-                        
-                        Text("3")
-                            .font(.caption2)
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
+                // Courses List with bottom padding for tab bar
+                ScrollView {
+                    LazyVStack(spacing: 16) {
+                        ForEach(filteredCourses) { course in
+                            NavigationLink(destination: CourseDetailView(course: course)) {
+                                CourseCard(course: course)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
                     }
+                    .padding()
+                    .padding(.bottom, 50) // Add padding at bottom for tab bar
                 }
             }
-            .padding(.vertical, 12)
-            .background(Color.white)
-            .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: -5)
+            
+            // Tab bar overlay
+            VStack(spacing: 0) {
+                Divider()
+                HStack(spacing: 0) {
+                    TabBarButton(title: "Courses", icon: "book.fill", isActive: true)
+                    TabBarButton(title: "Themes", icon: "list.bullet.clipboard")
+                    TabBarButton(title: "Chat", icon: "message")
+                    TabBarButton(title: "Notifications", icon: "bell") {
+                        Circle()
+                            .fill(Color.red)
+                            .frame(width: 8, height: 8)
+                    }
+                }
+                .frame(height: 49)
+                .background(Color.white)
+            }
         }
-        .background(Color(.systemGray6))
         .navigationBarHidden(true)
+        .edgesIgnoringSafeArea(.bottom)
         .sheet(isPresented: $showAddCourseSheet) {
             AddCourseView()
         }
@@ -271,10 +269,10 @@ struct TabBarButton<Badge: View>: View {
     }
     
     var body: some View {
-        VStack(spacing: 4) {
+        VStack(spacing: 2) {
             ZStack {
                 Image(systemName: icon)
-                    .font(.system(size: 22))
+                    .font(.system(size: 18))
                     .foregroundColor(isActive ? .accentColor : .gray)
                 
                 if let badge = badge {
@@ -285,13 +283,13 @@ struct TabBarButton<Badge: View>: View {
                         }
                         Spacer()
                     }
-                    .padding(.top, -8)
-                    .padding(.trailing, -8)
+                    .padding(.top, -5)
+                    .padding(.trailing, -5)
                 }
             }
             
             Text(title)
-                .font(.system(size: 10))
+                .font(.system(size: 9))
                 .foregroundColor(isActive ? .accentColor : .gray)
         }
         .frame(maxWidth: .infinity)

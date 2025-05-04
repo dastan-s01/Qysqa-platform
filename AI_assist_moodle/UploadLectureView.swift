@@ -69,14 +69,7 @@ struct UploadLectureView: View {
                 
                 Section {
                     Button("Upload Lecture") {
-                        courseStore.addLecture(
-                            to: course,
-                            number: lectureNumber,
-                            title: lectureTitle,
-                            fileURLs: selectedFiles
-                        )
-                        
-                        dismiss()
+                        uploadLectureToBackend()
                     }
                     .frame(maxWidth: .infinity, alignment: .center)
                     .foregroundColor(canSubmit ? .accentColor : .gray)
@@ -100,6 +93,59 @@ struct UploadLectureView: View {
     
     private var canSubmit: Bool {
         !lectureTitle.isEmpty && !selectedFiles.isEmpty
+    }
+    
+    private func uploadLectureToBackend() {
+        guard let fileURL = selectedFiles.first else { return }
+
+        var request = URLRequest(url: URL(string: "http://localhost:8080/api/lecture/upload")!) // Заменить на адрес бэка
+        request.httpMethod = "POST"
+
+        let boundary = UUID().uuidString
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+
+        var data = Data()
+
+        // subject_id
+        let subjectID = course.id.uuidString
+        data.append("Content-Disposition: form-data; name=\"subject_id\"\r\n\r\n".data(using: .utf8)!)
+        data.append("\(subjectID)\r\n".data(using: .utf8)!)
+
+        // title
+        data.append("--\(boundary)\r\n".data(using: .utf8)!)
+        data.append("Content-Disposition: form-data; name=\"title\"\r\n\r\n".data(using: .utf8)!)
+        data.append("\(lectureTitle)\r\n".data(using: .utf8)!)
+
+        // file
+        if let fileData = try? Data(contentsOf: fileURL) {
+            let filename = fileURL.lastPathComponent
+            let mimeType = "application/octet-stream"
+
+            data.append("--\(boundary)\r\n".data(using: .utf8)!)
+            data.append("Content-Disposition: form-data; name=\"file\"; filename=\"\(filename)\"\r\n".data(using: .utf8)!)
+            data.append("Content-Type: \(mimeType)\r\n\r\n".data(using: .utf8)!)
+            data.append(fileData)
+            data.append("\r\n".data(using: .utf8)!)
+        }
+
+        data.append("--\(boundary)--\r\n".data(using: .utf8)!)
+        request.httpBody = data
+
+        URLSession.shared.dataTask(with: request) { responseData, response, error in
+            if let error = error {
+                print("Error: \(error)")
+                return
+            }
+
+            guard let responseData = responseData else { return }
+
+            if let responseJSON = try? JSONSerialization.jsonObject(with: responseData) {
+                print("Upload success:", responseJSON)
+                DispatchQueue.main.async {
+                    dismiss()
+                }
+            }
+        }.resume()
     }
     
     private func removeFile(_ url: URL) {
